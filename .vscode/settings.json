@@ -1,0 +1,97 @@
+{
+	"workbench.tree.indent": 20,
+	"workbench.colorTheme": "RBLXDark",
+	"workbench.iconTheme": "vscode-icons",
+	// "editor.rulers": [
+	// 	100
+	// ],
+	"editor.tokenColorCustomizations": {
+		"[RBLXDark]": {
+			"comments": "#666666",
+			"functions": "#fdfbac",
+			"keywords": "#f86d7c",
+			"variables": "#cccccc",
+			"types": "#84d6f7",
+			"textMateRules": [
+				{
+					"scope":["storage.modifier"],"settings": {
+						"foreground": "#f86d7c"
+					}
+				},
+				{
+					"scope":["support"],"settings": {
+						"foreground": "#84d6f7"
+					}
+				}
+			]
+		}
+	},
+	"vsicons.associations.files": [
+		{
+			"icon": "lua_server",
+			"extensions": ["server.lua"],
+			"format": "png"
+		},
+		{
+			"icon": "lua_client",
+			"extensions": ["client.lua"],
+			"format": "png"
+		},
+		{
+			"icon": "lua_module",
+			"extensions": ["lua"],
+			"format": "png"
+		},
+		{
+			"icon": "studio",
+			"extensions": ["rbxlx", "rbxl"],
+			"format": "png"
+		},
+		{
+			"icon": "studiolocked",
+			"extensions": ["rbxlx.lock", "rbxl.lock"],
+			"format": "png"
+		},
+		{
+			"icon": "square",
+			"extensions": ["meta.json"],
+			"format": "png"
+		},
+		{
+			"icon": "gear",
+			"extensions": ["project.json"],
+			"format": "png"
+		},
+		{
+			"icon": "information",
+			"extensions": ["md"],
+			"format": "png"
+		},
+		{
+			"icon": "bullet",
+			"extensions": [".gitignore"],
+			"format": "png"
+		}
+	],
+	"vsicons.associations.folders": [
+		{
+			"icon": "game",
+			"extensions": ["src"],
+			"format": "png"
+		},
+		{
+			"icon": "serverscriptservice",
+			"extensions": ["ServerScriptService"],
+			"format": "png"
+		},
+		{
+			"icon": "studio",
+			"extensions": ["client", "server"],
+			"format": "png"
+		}
+	],
+	"vsicons.associations.folderDefault.folder": {
+		"icon": "studio",
+		"format": "png"
+	}
+}
