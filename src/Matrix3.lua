@@ -225,9 +225,9 @@ mt.__metatable = false
 
 -- Constructs a new Matrix3. Possible constructors are:
 --	Matrix3.new(): Creates a blank identity matrix
---  Matrix3.new(cframe): Creates a matrix from a CFrame
---  Matrix3.new(qX, qY, qZ, qW): Creates a matrix from a quaternion
---  Matrix3.new(m11, m12, m13, m21, m22, m23, m31, m32, m33): Creates a matrix from components
+--  	Matrix3.new(cframe): Creates a matrix from a CFrame
+--  	Matrix3.new(qX, qY, qZ, qW): Creates a matrix from a quaternion
+--  	Matrix3.new(m11, m12, m13, m21, m22, m23, m31, m32, m33): Creates a matrix from components
 function matrix3.new(...)
 	local self = {}
 	local components = {...}
