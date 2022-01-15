@@ -12,7 +12,7 @@ local atan2 = math.atan2
 
 local format = string.format
 
--- class
+-- Class
 
 local matrix3 = {}
 local mt = {}
@@ -26,6 +26,7 @@ local function sumType(t, x)
 	return sum
 end
 
+-- Private function to convert 3x3 matrix into a quaternion
 local function matrix3ToQuaternion(m)
 	local m11, m12, m13, m21, m22, m23, m31, m32, m33 = m:GetComponents()
 	local qw, qx, qy, qz
@@ -55,8 +56,13 @@ local function matrix3ToQuaternion(m)
 	return qw, qx, qy, qz
 end
 
--- metamethods
+-- Metamethods
 
+-- Index metamethod. A Matrix3 has three properties that can be indexed, which are the three basis vectors of the matrix
+-- This is also used for indexing the methods of the Matrix3 class
+--	 Matrix3.XVector: Vector of the first column of the matrix
+--	 Matrix3.YVector: Vector of the second column of the matrix
+--	 Matrix3.ZVector: Vector of the third column of the matrix
 function mt.__index(matrix, property)
 	local m = ref[matrix]
 
@@ -77,6 +83,7 @@ function mt.__newindex(matrix, property, value)
 	error(property .. " cannot be assigned to")
 end
 
+-- Check if two matrices are equal. Two matrices are equal when each corresponding component is equal
 function mt.__eq(a, b)
 	if ref[a] and ref[b] then
 		a, b = ref[a], ref[b]
@@ -89,14 +96,78 @@ function mt.__eq(a, b)
 	end
 end
 
+-- Add a Matrix3 with another Matrix3 or a CFrame
+-- If adding a CFrame, the Matrix3 must be on the left side of the addition
+function mt.__add(a, b)
+	if ref[a] and ref[b] then
+		-- Matrix3 + Matrix3
+		a, b = ref[a], ref[b]
+
+		return matrix3.new(
+			a[1]+b[1], a[2]+b[2], a[3]+b[3],
+			a[4]+b[4], a[5]+b[5], a[6]+b[6],
+			a[7]+b[7], a[8]+b[8], a[9]+b[9]
+		)
+	elseif ref[a] and typeof(b) == "CFrame" then
+		-- Matrix3 + CFrame
+		a = ref[a]
+		local x, y, z, c11, c12, c13, c21, c22, c23, c31, c32, c33 = b:GetComponents()
+
+		return matrix3.new(
+			a[1]+c11, a[2]+c12, a[3]+c13,
+			a[4]+c21, a[5]+c22, a[6]+c23,
+			a[7]+c31, a[8]+c32, a[9]+c33
+		)
+	elseif ref[a] then
+		error("bad argument #2 to '?' (Matrix3 expected, got " .. typeof(b) .. ")")
+	else
+		error("bad argument #1 to '?' (Matrix3 expected, got " .. typeof(a) .. ")")
+	end
+end
+
+-- Subtract a Matrix3 with another Matrix3 or a CFrame
+-- If subtracting a CFrame, the Matrix3 must be on the left side of the subtraction
+function mt.__sub(a, b)
+	if ref[a] and ref[b] then
+		-- Matrix3 - Matrix3
+		a, b = ref[a], ref[b]
+
+		return matrix3.new(
+			a[1]-b[1], a[2]-b[2], a[3]-b[3],
+			a[4]-b[4], a[5]-b[5], a[6]-b[6],
+			a[7]-b[7], a[8]-b[8], a[9]-b[9]
+		)
+	elseif ref[a] and typeof(b) == "CFrame" then
+		-- Matrix3 - CFrame
+		a = ref[a]
+		local x, y, z, c11, c12, c13, c21, c22, c23, c31, c32, c33 = b:GetComponents()
+
+		return matrix3.new(
+			a[1]-c11, a[2]-c12, a[3]-c13,
+			a[4]-c21, a[5]-c22, a[6]-c23,
+			a[7]-c31, a[8]-c32, a[9]-c33
+		)
+	elseif ref[a] then
+		error("bad argument #2 to '?' (Matrix3 expected, got " .. typeof(b) .. ")")
+	else
+		error("bad argument #1 to '?' (Matrix3 expected, got " .. typeof(a) .. ")")
+	end
+end
+
+-- Multiply a Matrix3 with another Matrix3, a CFrame, a Vector3, or a number
+-- Multiplying matrices or a matrix with a CFrame corresponds to matrix multiplication
+-- Multiplying a matrix by a vector corresponds to matrix-vector multiplication
+-- Multiplying a matrix by a number scales the matrix by that number
+-- If multiplying by a CFrame or a Vector3, the Matrix3 must be on the left side of the multiplication
+-- If multiplying by a number, the number can be on either side of the multiplication
 function mt.__mul(a, b)
 	if ref[a] and ref[b] then
 		-- Matrix3 * Matrix3
 		a, b = ref[a], ref[b]
 
 		return matrix3.new(
-			a[1]*b[1] + a[2]*b[4] + a[3]*b[7], a[1]*b[2] + a[2]*b[5] + a[3]*b[8], a[1]*b[3] + a[2]*b[6] + a[3]*b[9], 
-			a[4]*b[1] + a[5]*b[4] + a[6]*b[7], a[4]*b[2] + a[5]*b[5] + a[6]*b[8], a[4]*b[3] + a[5]*b[6] + a[6]*b[9], 
+			a[1]*b[1] + a[2]*b[4] + a[3]*b[7], a[1]*b[2] + a[2]*b[5] + a[3]*b[8], a[1]*b[3] + a[2]*b[6] + a[3]*b[9],
+			a[4]*b[1] + a[5]*b[4] + a[6]*b[7], a[4]*b[2] + a[5]*b[5] + a[6]*b[8], a[4]*b[3] + a[5]*b[6] + a[6]*b[9],
 			a[7]*b[1] + a[8]*b[4] + a[9]*b[7], a[7]*b[2] + a[8]*b[5] + a[9]*b[8], a[7]*b[3] + a[8]*b[6] + a[9]*b[9]
 		)
 	elseif ref[a] and typeof(b) == "CFrame" then
@@ -105,8 +176,8 @@ function mt.__mul(a, b)
 		local x, y, z, c11, c12, c13, c21, c22, c23, c31, c32, c33 = b:GetComponents()
 
 		return matrix3.new(
-			a[1]*c11 + a[2]*c21 + a[3]*c31, a[1]*c12 + a[2]*c22 + a[3]*c32, a[1]*c13 + a[2]*c23 + a[3]*c33, 
-			a[4]*c11 + a[5]*c21 + a[6]*c31, a[4]*c12 + a[5]*c22 + a[6]*c32, a[4]*c13 + a[5]*c23 + a[6]*c33, 
+			a[1]*c11 + a[2]*c21 + a[3]*c31, a[1]*c12 + a[2]*c22 + a[3]*c32, a[1]*c13 + a[2]*c23 + a[3]*c33,
+			a[4]*c11 + a[5]*c21 + a[6]*c31, a[4]*c12 + a[5]*c22 + a[6]*c32, a[4]*c13 + a[5]*c23 + a[6]*c33,
 			a[7]*c11 + a[8]*c21 + a[9]*c31, a[7]*c12 + a[8]*c22 + a[9]*c32, a[7]*c13 + a[8]*c23 + a[9]*c33
 		)
 	elseif ref[a] and typeof(b) == "Vector3" then
@@ -124,18 +195,18 @@ function mt.__mul(a, b)
 		a = ref[a]
 
 		return matrix3.new(
-			a[1]*b + a[2]*b + a[3]*b,
-			a[4]*b + a[5]*b + a[6]*b,
-			a[7]*b + a[8]*b + a[9]*b
+			a[1]*b, a[2]*b, a[3]*b,
+			a[4]*b, a[5]*b, a[6]*b,
+			a[7]*b, a[8]*b, a[9]*b
 		)
 	elseif typeof(a) == "number" and ref[b] then
 		-- number * Matrix3
 		b = ref[b]
 
 		return matrix3.new(
-			a*b[1] + a*b[2] + a*b[3],
-			a*b[4] + a*b[5] + a*b[6],
-			a*b[7] + a*b[8] + a*b[9]
+			a*b[1], a*b[2], a*b[3],
+			a*b[4], a*b[5], a*b[6],
+			a*b[7], a*b[8], a*b[9]
 		)
 	elseif ref[a] then
 		error("bad argument #2 to '?' (Vector3 expected, got " .. typeof(b) .. ")")
@@ -152,6 +223,11 @@ mt.__metatable = false
 
 -- public constructors
 
+-- Constructs a new Matrix3. Possible constructors are:
+--	Matrix3.new(): Creates a blank identity matrix
+--  Matrix3.new(cframe): Creates a matrix from a CFrame
+--  Matrix3.new(qX, qY, qZ, qW): Creates a matrix from a quaternion
+--  Matrix3.new(m11, m12, m13, m21, m22, m23, m31, m32, m33): Creates a matrix from components
 function matrix3.new(...)
 	local self = {}
 	local components = {...}
@@ -159,6 +235,7 @@ function matrix3.new(...)
 	if #components < 0 or #components > 9 then
 		error("Invalid number of arguments: " .. #components)
 	elseif #components == 0 then
+		-- identity matrix
 		components = {1, 0, 0, 0, 1, 0, 0, 0, 1}
 	elseif #components == 1 and typeof(components[1] == "CFrame") then
 		-- from cframe
@@ -178,6 +255,7 @@ function matrix3.new(...)
 	elseif #components == 9 and sumType(components, "number") == 9 then
 		-- from components
 	else
+		print(...)
 		error("Invalid arguments")
 	end
 
@@ -185,6 +263,7 @@ function matrix3.new(...)
 	return setmetatable(self, mt)
 end
 
+-- Create a Matrix3 pointing from eye to target, optionally specifying an upward direction
 function matrix3.lookAt(eye, target, upDir)
 	upDir = upDir.Unit or v3.yAxis
 	local forward = (target - eye).Unit
@@ -198,6 +277,7 @@ function matrix3.lookAt(eye, target, upDir)
 	)
 end
 
+-- Create a Matrix3 from euler angles, applied in Z,Y,X order
 function matrix3.fromEulerAnglesXYZ(rx, ry, rz)
 	local cx, sx = cos(rx), sin(rx)
 	local cy, sy = cos(ry), sin(ry)
@@ -210,6 +290,7 @@ function matrix3.fromEulerAnglesXYZ(rx, ry, rz)
 	)
 end
 
+-- Create a Matrix3 from euler angles, applied in Y,X,Z order
 function matrix3.fromEulerAnglesYXZ(rx, ry, rz)
 	local cx, sx = cos(rx), sin(rx)
 	local cy, sy = cos(ry), sin(ry)
@@ -222,6 +303,7 @@ function matrix3.fromEulerAnglesYXZ(rx, ry, rz)
 	)
 end
 
+-- Create a Matrix3 from a unit vector axis and an angle
 function matrix3.fromAxisAngle(v, r)
 	v = v.Unit
 	local vx, vy, vz = v.X, v.Y, v.Z
@@ -234,6 +316,7 @@ function matrix3.fromAxisAngle(v, r)
 	)
 end
 
+-- Create a Matrix3 from 3 vectors representing the basis vectors of the matrix
 function matrix3.fromMatrix(vx, vy, vz)
 	if not vz then
 		vz = vx:Cross(vy).Unit
@@ -246,16 +329,19 @@ matrix3.fromOrientation = matrix3.fromEulerAnglesYXZ;
 
 -- public methods
 
+-- Return the components of the matrix
 function matrix3:GetComponents()
 	return unpack(ref[self])
 end
 
+-- Return the determinant of the matrix
 function matrix3:Determinant()
 	local m = ref[self]
 
 	return m[1] * (m[5]*m[9] - m[8]*m[6]) - m[2] * (m[4]*m[9] - m[7]*m[6]) + m[3] * (m[4]*m[8] - m[7]*m[5])
 end
 
+-- Return the transpose of the matrix
 function matrix3:Transpose()
 	local m = ref[self]
 
@@ -266,6 +352,8 @@ function matrix3:Transpose()
 	)
 end
 
+-- Return the inverse of the matrix
+-- When the matrix is orthogonal, this will be equivalent to Matrix3:Transpose(), so it's preferred to use that for rotation matrices since it's much faster
 function matrix3:Inverse()
 	local m = ref[self]
 
@@ -284,22 +372,27 @@ function matrix3:Inverse()
 	)
 end
 
+-- Returns a Matrix3 transformed by the matrix. Equivalent to m1 * m2
 function matrix3:Transform(m2)
 	return self * m2
 end
 
+-- Returns a Matrix3 transformed by the inverse matrix. Equivalent to m1:Inverse() * m2
 function matrix3:InverseTransform(m2)
 	return self:Inverse() * m2
 end
 
+-- Returns a Vector3 transformed by the matrix. Equivalent to m * v
 function matrix3:VectorTransform(v)
 	return self * v
 end
 
+-- Returns a Vector3 transformed by the inverse matrix. Equivalent to m:Inverse() * v
 function matrix3:VectorInverseTransform(v)
 	return self:Inverse() * v
 end
 
+-- Convert matrix to approximate euler angles, in Z,Y,X order
 function matrix3:ToEulerAnglesXYZ()
 	local m = ref[self]
 	local rx = atan2(-m[9], m[12])
@@ -308,6 +401,7 @@ function matrix3:ToEulerAnglesXYZ()
 	return rx, ry, rz
 end
 
+-- Convert matrix to approximate euler angles, in Y,X,Z order
 function matrix3:ToEulerAnglesYXZ()
 	local m = ref[self]
 	local rx = asin(-m[9])
@@ -316,31 +410,43 @@ function matrix3:ToEulerAnglesYXZ()
 	return rx, ry, rz
 end
 
+-- Convert matrix to an axis-angle representation as a Vector3 and a number
 function matrix3:ToAxisAngle()
 	local qw, qx, qy, qz = matrix3ToQuaternion(self);
 	
 	-- pick the twin closest to identity quaternion
 	if (qw <= 0) then
 		qw, qx, qy, qz = -qw, -qx, -qy, -qz
-	end	
+	end
+	if qw >= 1 then
+		qw = 1
+	end
 	
 	local theta = acos(qw) * 2
-	local axis = v3(qx, qy, qz) / sin(theta*0.5)
-	
-	if (axis:Dot(axis) > 0) then
-		return axis.unit, theta
+	if theta ~= 0 then
+		local axis = v3.new(qx, qy, qz) / sin(theta*0.5)
+		return axis.Unit, theta
 	else
-		return v3(1, 0, 0), theta
+		return v3.xAxis, theta
 	end
 end
 
+-- Return a Matrix3 linearly interpolated between this Matrix3 and another Matrix3 by a fraction t
+-- For rotation matrices, use Matrix3:Slerp()
 function matrix3:Lerp(m2, t)
-	local diff = self:inverse() * m2
-	local axis, theta = diff:toAxisAngle()
+	return self + (m2 - self) * t
+end
+
+-- Return a Matrix3 interpolated using spherical-linear interpolation (SLERP) between this Matrix3 and another Matrix3 by a fraction t
+function matrix3:Slerp(m2, t)
+	local diff = self:Transpose() * m2
+	print(diff:Determinant())
+	local axis, theta = diff:ToAxisAngle()
 	local m = ref[self * matrix3.fromAxisAngle(axis, theta * t)]
 	return matrix3.new(m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9])
 end
 
+-- Convert Matrix3 to a CFrame
 function matrix3:ToCFrame()
 	local m = ref[self]
 
@@ -358,6 +464,7 @@ matrix3.toEulerAnglesYXZ = matrix3.ToEulerAnglesYXZ
 matrix3.toEulerAnglesXYZ = matrix3.ToEulerAnglesXYZ
 matrix3.toAxisAngle = matrix3.ToAxisAngle
 matrix3.lerp = matrix3.Lerp
+matrix3.slerp = matrix3.Slerp
 matrix3.toCFrame = matrix3.ToCFrame
 
 return matrix3
