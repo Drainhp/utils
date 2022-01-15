@@ -373,13 +373,13 @@ function matrix3:Inverse()
 end
 
 -- Returns a Matrix3 transformed by the matrix. Equivalent to m1 * m2
-function matrix3:Transform(m2)
-	return self * m2
+function matrix3:Transform(m)
+	return self * m
 end
 
 -- Returns a Matrix3 transformed by the inverse matrix. Equivalent to m1:Inverse() * m2
-function matrix3:InverseTransform(m2)
-	return self:Inverse() * m2
+function matrix3:InverseTransform(m)
+	return self:Inverse() * m
 end
 
 -- Returns a Vector3 transformed by the matrix. Equivalent to m * v
