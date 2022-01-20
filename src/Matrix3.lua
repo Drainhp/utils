@@ -96,6 +96,19 @@ function mt.__eq(a, b)
 	end
 end
 
+-- Return the negated Matrix3
+function mt.unm(matrix)
+	if ref[matrix] then
+		-- -Matrix3
+		local m = ref[matrix]
+		return matrix3.new(
+			-m[1], -m[2], -m[3],
+			-m[4], -m[5], -m[6],
+			-m[7], -m[8], -m[9]
+		)
+	end
+end
+
 -- Add a Matrix3 with another Matrix3 or a CFrame
 -- If adding a CFrame, the Matrix3 must be on the left side of the addition
 function mt.__add(a, b)
@@ -158,7 +171,10 @@ end
 -- Multiplying matrices or a matrix with a CFrame corresponds to matrix multiplication
 -- Multiplying a matrix by a vector corresponds to matrix-vector multiplication
 -- Multiplying a matrix by a number scales the matrix by that number
--- If multiplying by a CFrame or a Vector3, the Matrix3 must be on the left side of the multiplication
+-- If multiplying by a CFrame, the Matrix3 must be on the left side of the multiplication
+-- If multiplying by a Vector3, the Matrix3 can be on either side of the multiplication
+--     Matrix3 * Vector3 is matrix-vector multiplication, and returns a Vector3
+--     Vector3 * Matrix3 returns a Matrix3
 -- If multiplying by a number, the number can be on either side of the multiplication
 function mt.__mul(a, b)
 	if ref[a] and ref[b] then
@@ -189,6 +205,16 @@ function mt.__mul(a, b)
 			a[1]*x + a[2]*y + a[3]*z,
 			a[4]*x + a[5]*y + a[6]*z,
 			a[7]*x + a[8]*y + a[9]*z
+		)
+	elseif typeof(a) == "Vector3" and ref[b] then
+		-- Vector3 * Matrix3
+		b = ref[b]
+		local x, y, z = a.X, a.Y, a.Z
+
+		return matrix3.new(
+			x*b[1], y*b[2], z*b[3],
+			x*b[4], y*b[5], z*b[6],
+			x*b[7], y*b[8], z*b[9]
 		)
 	elseif ref[a] and typeof(b) == "number" then
 		-- Matrix3 * number
@@ -255,7 +281,6 @@ function matrix3.new(...)
 	elseif #components == 9 and sumType(components, "number") == 9 then
 		-- from components
 	else
-		print(...)
 		error("Invalid arguments")
 	end
 
@@ -440,7 +465,6 @@ end
 -- Return a Matrix3 interpolated using spherical-linear interpolation (SLERP) between this Matrix3 and another Matrix3 by a fraction t
 function matrix3:Slerp(m2, t)
 	local diff = self:Transpose() * m2
-	print(diff:Determinant())
 	local axis, theta = diff:ToAxisAngle()
 	local m = ref[self * matrix3.fromAxisAngle(axis, theta * t)]
 	return matrix3.new(m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9])
