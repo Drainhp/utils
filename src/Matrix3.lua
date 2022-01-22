@@ -174,7 +174,7 @@ end
 -- If multiplying by a CFrame, the Matrix3 must be on the left side of the multiplication
 -- If multiplying by a Vector3, the Matrix3 can be on either side of the multiplication
 --     Matrix3 * Vector3 is matrix-vector multiplication, and returns a Vector3
---     Vector3 * Matrix3 returns a Matrix3
+--     Vector3 * Matrix3 is a row-vector multiplied by a matrix and returns a Vector3
 -- If multiplying by a number, the number can be on either side of the multiplication
 function mt.__mul(a, b)
 	if ref[a] and ref[b] then
@@ -211,10 +211,10 @@ function mt.__mul(a, b)
 		b = ref[b]
 		local x, y, z = a.X, a.Y, a.Z
 
-		return matrix3.new(
-			x*b[1], y*b[2], z*b[3],
-			x*b[4], y*b[5], z*b[6],
-			x*b[7], y*b[8], z*b[9]
+		return v3.new(
+			x*b[1] + y*b[4] + z*b[7],
+			x*b[2] + y*b[5] + z*b[8],
+			x*b[3] + y*b[6] + z*b[9]
 		)
 	elseif ref[a] and typeof(b) == "number" then
 		-- Matrix3 * number
