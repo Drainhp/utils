@@ -97,7 +97,7 @@ function mt.__eq(a, b)
 end
 
 -- Return the negated Matrix3
-function mt.unm(matrix)
+function mt.__unm(matrix)
 	if ref[matrix] then
 		-- -Matrix3
 		local m = ref[matrix]
