@@ -385,14 +385,14 @@ function matrix3:Inverse()
 	local invDet = 1 / self:Determinant()
 
 	return matrix3.new(
-		(m[5]*m[9] - m[7]*m[6]) * invDet,
-		(m[3]*m[7] - m[2]*m[9]) * invDet,
-		(m[2]*m[6] - m[3]*m[5]) * invDet,
-		(m[6]*m[7] - m[4]*m[9]) * invDet,
-		(m[1]*m[9] - m[3]*m[7]) * invDet,
+		(m[5]*m[9] - m[8]*m[6]) * invDet,
+		(m[3]*m[8] - m[2]*m[9]) * invDet,
+		(m[2]*m[6] - m[5]*m[3]) * invDet,
+		(m[7]*m[6] - m[4]*m[9]) * invDet,
+		(m[1]*m[9] - m[7]*m[3]) * invDet,
 		(m[4]*m[3] - m[1]*m[6]) * invDet,
-		(m[4]*m[7] - m[7]*m[5]) * invDet,
-		(m[7]*m[2] - m[1]*m[7]) * invDet,
+		(m[4]*m[8] - m[7]*m[5]) * invDet,
+		(m[7]*m[2] - m[1]*m[8]) * invDet,
 		(m[1]*m[5] - m[4]*m[2]) * invDet
 	)
 end
